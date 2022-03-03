@@ -1,4 +1,5 @@
 // const req = require("express/lib/request");
+const { default: mongoose } = require("mongoose");
 const { BadRequestError } = require("../errors");
 const handlePromise = require("../helpers/promise.helper");
 const Contact = require("../models/contact.model");
@@ -49,8 +50,9 @@ const Contact = require("../models/contact.model");
     //     res.send({message:"findOne handler"});
     // };
     exports.findOne = async(req,res,next)=>{
+        const {id} = req.params;
             const condition = {
-                _id:req.params.id,
+                _id:id && mongoose.isValidObjectId(id) ? id :null,
             };
             const [error,document] = await handlePromise(Contact.findOne(condition));
             if(error){
@@ -69,8 +71,9 @@ const Contact = require("../models/contact.model");
             return next(new BadRequestError(400,"Data to update can not be empty"));
         }
 
+        const {id} = req.params;
         const condition = {
-            _id:req.params.id,
+            _id:id && mongoose.isValidObjectId(id) ? id :null,
         };
 
         const [error,document] = await handlePromise(Contact.findOneAndUpdate(condition,req.body,{
@@ -89,9 +92,10 @@ const Contact = require("../models/contact.model");
     //     res.send({message:"delete handler"});
     // };
     exports.delete = async (req,res,next)=>{
-         const condition = {
-            _id:req.params.id,
-            };
+        const {id} = req.params;
+        const condition = {
+            _id:id && mongoose.isValidObjectId(id) ? id :null,
+        };
             const [error,document] = await handlePromise(Contact.findOneAndDelete(condition));
             if(error){
                 return next(new BadRequestError(500,`Could not deleted contact with id = ${req.params.id}`));
